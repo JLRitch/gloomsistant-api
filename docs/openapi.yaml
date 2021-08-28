@@ -253,6 +253,64 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         default:
           $ref: '#/components/responses/UnexpectedError'
+
+  /players/{id}/characters:
+    get:
+      tags:
+        - Players
+        - Characters
+      summary: Responds with a specific player's characters
+      description: >
+        Returns all the characters associated with a given player
+      operationId: getPlayerCharacters
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested player
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    [
+                      {
+                        "id": 3,
+                        "name": "Turkish"
+                      },
+                      {
+                        "id": 4,
+                        "name": "Bullet Tooth Tony"
+                      },
+                      {
+                        "id": 5,
+                        "name": "Mickey O'Neil"
+                      }
+                    ]
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
 # ------------------------------------- #
 # characters
 # ------------------------------------- #
