@@ -1,0 +1,578 @@
+openapi: 3.0.3
+
+info:
+  title: gloom-sistant
+  version: 0.0.1
+
+servers:
+  - url: http://localhost:8000
+    description: Local Server
+
+paths:
+# ------------------------------------- #
+# players
+# ------------------------------------- #
+  /players:
+    get:
+      tags:
+        - Players
+      summary: Returns a list of players.
+      description: >
+        Returns a list of basic info for all players.
+      operationId: getUsers
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    email:
+                      type: string
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    [
+                      {
+                        "id": 1,
+                        "firstName": "Logan",
+                        "lastName": "Lucky",
+                        "email": "ll@llmail.com"
+                      },
+                      {
+                        "id": 2,
+                        "firstName": "George",
+                        "lastName": "Gorgeous",
+                        "email": "gg@ggmail.com"
+                      }
+                    ]
+                empty:
+                  summary: Empty
+                  value: []
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    post:
+      tags:
+        - Players
+      summary: Creates a player/user
+      description: >
+        Creates a player/user given required information and returns the id
+        of the newly created record.
+      operationId: createPlayer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+              required:
+                - firstName
+                - lastName
+                - email
+            examples:
+              normal:
+                summary: Normal
+                value: >
+                  {
+                    "firstName": "Logan",
+                    "lastName": "Lucky",
+                    "email": "ll@llmail.com"
+                  }
+      responses:
+        201:
+          description: Resource created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 1
+                    }
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+  /players/{id}:
+    get:
+      tags:
+        - Players
+      summary: Responds with a specific player's details
+      description: >
+        Returns all the details associated with a given player
+      operationId: getPlayer
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested player
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  firstName:
+                    type: string
+                  lastName:
+                    type: string
+                  email:
+                    type: string
+                  characters:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 2,
+                      "firstName": "George",
+                      "lastName": "Gorgeous",
+                      "email": "gg@ggmail.com"
+                      "characters": [
+                        {
+                          "id": 3,
+                          "name": "Turkish"
+                        },
+                        {
+                          "id": 4,
+                          "name": "Bullet Tooth Tony"
+                        },
+                        {
+                          "id": 5,
+                          "name": "Mickey O'Neil"
+                        }
+                      ]
+                    }
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    put:
+      tags:
+        - Players
+      summary: Updates a specific player's details
+      description: >
+        Updates the details of a specific player given new info in
+        request payload.
+      operationId: updatePlayer
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested player
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+      responses:
+        204:
+          description: Resource updated
+        404:
+          description: An error occurred
+    delete:
+      tags:
+        - Players
+      summary: Deletes a player
+      description: >
+        Deletes a player
+      operationId: deletePlayer
+      parameters:
+        - name: id
+          in: path
+          description: ID of player to be deleted
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        204:
+          description: Resource deleted
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+# ------------------------------------- #
+# characters
+# ------------------------------------- #
+  /characters:
+    post:
+      tags:
+        - Characters
+      summary: Creates a new character record
+      description: >
+        Creates a new character given the information provided in request body.
+        Returns the id of the newly created character.
+      operationId: createCharacter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+              required:
+                - firstName
+                - lastName
+                - email
+            examples:
+              normal:
+                summary: Normal
+                value: >
+                  {
+                    "name": "Turkish",
+                    "playerId": 2,
+                    "class": "Quatryl Demolitionist",
+                    "level": 1,
+                    "xp": 35,
+                    "gold": 16,
+                    "inventory": [
+                      "Heater Shield",
+                      "Healing Potion",
+                      "Winged Shoes"
+                    ],
+                    "perks": [
+                      {
+                        "perkDesc": "Replace one +1 card with one +2 FIRE card",
+                        "perkLevel": 1
+                      }
+                    ],
+                    "goalsCompleted": 1
+                  }
+      responses:
+        201:
+          description: Resource created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 3
+                    }
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  
+  /characters/{id}:
+    get:
+      tags:
+        - Characters
+      summary: Responds with a specific character's details
+      description: >
+        Returns all the details associated with a given character
+      operationId: getCharacter
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested character
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  playerId:
+                    type: integer
+                  class:
+                    type: string
+                  level:
+                    type: integer
+                  xp:
+                    type: integer
+                  gold:
+                    type: integer
+                  inventory:
+                    type: array
+                    items:
+                      type: string
+                  perks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        perkDesc:
+                          type: string
+                        perkLevel:
+                          type: integer
+                  goalsCompleted:
+                    type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 3,
+                      "name": "Turkish",
+                      "playerId": 2,
+                      "class": "Quatryl Demolitionist",
+                      "level": 1,
+                      "xp": 35,
+                      "gold": 16,
+                      "inventory": [
+                        "Heater Shield",
+                        "Healing Potion",
+                        "Winged Shoes"
+                      ],
+                      "perks": [
+                        {
+                          "perkDesc": "Replace one +1 card with one +2 FIRE card",
+                          "perkLevel": 1
+                        }
+                      ],
+                      "goalsCompleted": 1
+                    }
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+    put:
+      tags:
+        - Characters
+      summary: Updates a specific character's details
+      description: >
+        Updates the details of a specific character given new info in
+        request payload.
+      operationId: updateCharacter
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested character
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                class:
+                  type: string
+                level:
+                  type: integer
+                xp:
+                  type: integer
+                gold:
+                  type: integer
+                inventory:
+                  type: array
+                  items:
+                    type: string
+                perks:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      perkDesc:
+                        type: string
+                      perkLevel:
+                        type: integer
+                goalsCompleted:
+                  type: integer
+            examples:
+              normal:
+                summary: Normal
+                value: >
+                  {
+                    "name": "Turkish",
+                    "class": "Quatryl Demolitionist",
+                    "level": 2,
+                    "xp": 45,
+                    "gold": 25,
+                    "inventory": [
+                      "Heater Shield",
+                      "Healing Potion",
+                      "Winged Shoes"
+                    ],
+                    "perks": [
+                      {
+                        "perkDesc": "Replace one +1 card with one +2 FIRE card",
+                        "perkLevel": 2
+                      }
+                    ],
+                    "goalsCompleted": 2
+                  }
+      responses:
+        204:
+          description: Resource updated
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    delete:
+      tags:
+        - Characters
+      summary: Deletes a character
+      description: >
+        Deletes a character
+      operationId: deleteCharacter
+      parameters:
+        - name: id
+          in: path
+          description: ID of character to be deleted
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        204:
+          description: Resource deleted
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+components:
+  responses:
+    BadRequestError:
+      description: The server could not understand the request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            normal:
+              summary: Normal
+              value: >
+                {
+                  "code": "BadRequest",
+                  "message": "Very detailed error info"
+                }
+    
+    NotFoundError:
+      description: The requested resource could not be found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            normal:
+              summary: Normal
+              value: >
+                {
+                  "code": "NotFound",
+                  "message": "Very detailed error info"
+                }
+
+    UnexpectedError:
+      description: An unexpected error occurred
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            normal:
+              summary: Normal
+              value: >
+                {
+                  "code": "Internal",
+                  "message": "Very detailed error info"
+                }
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
