@@ -272,16 +272,16 @@ paths:
             schema:
               type: object
               properties:
-                firstName:
+                name:
                   type: string
-                lastName:
-                  type: string
-                email:
+                playerid:
+                  type: integer
+                class:
                   type: string
               required:
-                - firstName
-                - lastName
-                - email
+                - name
+                - playerid
+                - class
             examples:
               normal:
                 summary: Normal
