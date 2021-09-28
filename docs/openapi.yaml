@@ -19,7 +19,7 @@ paths:
       summary: Returns a list of players.
       description: >
         Returns a list of basic info for all players.
-      operationId: getUsers
+      operationId: getPlayers
       responses:
         200:
           description: Successful operation
@@ -385,26 +385,30 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         default:
           $ref: '#/components/responses/UnexpectedError'
-  
-  /characters/{id}:
+
     get:
       tags:
         - Characters
-      summary: Responds with a specific character's details
+      summary: Respond with details for a a single character or group of characters.
       description: >
-        Returns all the details associated with a given character
-      operationId: getCharacter
+        Takes an array of character ids and responds with their details.
+      operationId: getCharacterDetails
       parameters:
-        - name: id
-          in: path
-          description: ID of requested character
-          required: true
+        - in: query
+          name: charIds
           schema:
-            type: integer
+            type: array
+            items:
+              type: integer
+          style: form
+          explode: false
           examples:
-            normal:
-              summary: Normal
-              value: 1
+            singleId:
+              summary: Example of single Character ID
+              value: [1]   # ?charId=1
+            multipleIds:
+              summary: Example of multiple Character IDs
+              value: [1, 2]   # ?charIds=1,2
       responses:
         200:
           description: Successful operation
@@ -443,35 +447,80 @@ paths:
                   goalsCompleted:
                     type: integer
               examples:
-                normal:
-                  summary: Normal
+                singleId:
+                  summary: Single CharacterID
                   value: >
-                    {
-                      "id": 3,
-                      "name": "Turkish",
-                      "playerId": 2,
-                      "class": "Quatryl Demolitionist",
-                      "level": 1,
-                      "xp": 35,
-                      "gold": 16,
-                      "inventory": [
-                        "Heater Shield",
-                        "Healing Potion",
-                        "Winged Shoes"
-                      ],
-                      "perks": [
-                        {
-                          "perkDesc": "Replace one +1 card with one +2 FIRE card",
-                          "perkLevel": 1
-                        }
-                      ],
-                      "goalsCompleted": 1
-                    }
-        404:
-          $ref: '#/components/responses/NotFoundError'
-        default:
-          $ref: '#/components/responses/UnexpectedError'
+                    [
+                      {
+                        "id": 1,
+                        "name": "Turkish",
+                        "playerId": 2,
+                        "class": "Quatryl Demolitionist",
+                        "level": 1,
+                        "xp": 35,
+                        "gold": 16,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion",
+                          "Winged Shoes"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +2 FIRE card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      }
+                    ]
+                multipleIds:
+                  summary: Multiple Character IDs
+                  value: >
+                    [
+                      {
+                        "id": 1,
+                        "name": "Turkish",
+                        "playerId": 2,
+                        "class": "Quatryl Demolitionist",
+                        "level": 1,
+                        "xp": 35,
+                        "gold": 16,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion",
+                          "Winged Shoes"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +2 FIRE card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      },
+                      {
+                        "id": 2,
+                        "name": "John The Gunn",
+                        "playerId": 3,
+                        "class": "Valrath Red Guard",
+                        "level": 1,
+                        "xp": 42,
+                        "gold": 30,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +1 SHIELD card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      }
+                    ]
 
+  /characters/{id}:
     put:
       tags:
         - Characters
