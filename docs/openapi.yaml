@@ -126,7 +126,7 @@ paths:
       summary: Responds with a specific player's details
       description: >
         Returns all the details associated with a given player
-      operationId: getPlayer
+      operationId: getPlayerDetail
       parameters:
         - name: id
           in: path
@@ -645,7 +645,7 @@ paths:
                 characters:
                   type: array
                   items:
-                    type: string
+                    type: integer
               required:
                 - name
             examples:
@@ -688,7 +688,7 @@ paths:
       summary: Responds with a specific campaigns's details
       description: >
         Returns all the details associated with a given campaign
-      operationId: getCampaign
+      operationId: getCampaignDetail
       parameters:
         - name: id
           in: path
@@ -819,7 +819,246 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         default:
           $ref: '#/components/responses/UnexpectedError'
-    
+
+# ------------------------------------- #
+# Sessions
+# ------------------------------------- #
+  /sessions:
+    post:
+      tags:
+        - Sessions
+      summary: Create a new session
+      description: >
+        Creates a new session with a given start date, characters, and mission
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                campaign:
+                  type: integer
+                mission:
+                  type: integer
+                characters:
+                  type: array
+                  items:
+                    type: integer
+              required:
+                - date
+                - campaign
+                - mission
+                - characters
+            examples:
+              normal:
+                summary: Normal
+                value: >
+                  {
+                    "date": "2021-09-28",
+                    "campaign": 1,
+                    "mission": 5,
+                    "characters": [
+                      1,
+                      2,
+                      3
+                    ]
+                  }
+      responses:
+        201:
+          description: Resource created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 1
+                    }
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+    get:
+      tags:
+        - Sessions
+      summary: Returns a list of sessions.
+      description: >
+        Returns a list of basic info for all session.
+      operationId: getSessions
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    date:
+                      type: string
+                    campaign:
+                      type: integer
+                    mission:
+                      type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    [
+                      {
+                        "id": 1,
+                        "date": "2021-09-21",
+                        "campaign": 1,
+                        "mission": 1
+                      },
+                      {
+                        "id": 2,
+                        "date": "2021-09-28",
+                        "campaign": 1,
+                        "mission": 2
+                      }
+                    ]
+                empty:
+                  summary: Empty
+                  value: []
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+  /sessions/{id}:
+    get:
+      tags:
+        - Sessions
+      summary: Responds with a specific session's details
+      description: >
+        Returns all the details associated with a given session
+      operationId: getSessionDetail
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    date:
+                      type: string
+                    campaign:
+                      type: integer
+                    mission:
+                      type: integer
+                    characters:
+                      type: array
+                      items:
+                        type: integer
+                    sessionDifficultyLevel:
+                      type: integer
+                    townEventCompleted:
+                      type: boolean
+                    battleGoalsCompleted:
+                      type: object
+                      properties:
+                        character:
+                          type: integer
+                        goalCompleted:
+                          type: boolean
+                    missionExperienceGained:
+                      type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 1,
+                      "date": "2021-09-21",
+                      "campaign": 1,
+                      "mission": 1,
+                      "characters": [
+                        1, 2, 3
+                      ],
+                      "sessionDifficultyLevel": 1,
+                      "townEventCompleted": true,
+                      "battleGoalsCompleted": {
+                        1: true,
+                        2: true,
+                        3: false
+                      },
+                      "missionExperienceGained": 8
+                    }
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+    put: # TODO flush out put endpoint, may need to break out into multple update functions
+      tags:
+        - Sessions
+      summary: Updates a specific campaign's name
+      description: >
+        Updates a the name of the specific campaign for the id provided
+      operationId: updateSession
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+            examples:
+              normal:
+                summary: Normal
+                value: >
+                  {
+                    "name": "Kate's Game"
+                  }
+      responses:
+        204:
+          description: Resource updated
+        404:
+          description: An error occurred
 components:
   responses:
     BadRequestError:
