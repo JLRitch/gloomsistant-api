@@ -578,7 +578,248 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         default:
           $ref: '#/components/responses/UnexpectedError'
+# ------------------------------------- #
+# Campaigns
+# ------------------------------------- #
+  /campaigns:
+    get:
+      tags:
+        - Campaigns
+      summary: Returns a list of campaigns.
+      description: >
+        Returns a list of basic info for all campaigns.
+      operationId: getCampaigns
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    [
+                      {
+                        "id": 1,
+                        "name": "Jere's Game"
+                      },
+                      {
+                        "id": 2,
+                        "name": "Tom's Game"
+                      }
+                    ]
+                empty:
+                  summary: Empty
+                  value: []
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    
+    post:
+      tags:
+        - Campaigns
+      summary: Creates a campaign
+      description: >
+        Creates a campaign given required information and returns the id
+        of the newly created record.
+      operationId: createCampaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                characters:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - name
+            examples:
+              normal:
+                summary: Normal
+                value: >
+                  {
+                    "name": "Logan",
+                    "characters": [
+                      1,
+                      2
+                    ]
+                  }
+      responses:
+        201:
+          description: Resource created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 1
+                    }
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  
+  /campaigns/{id}:
+    get:
+      tags:
+        - Campaigns
+      summary: Responds with a specific campaigns's details
+      description: >
+        Returns all the details associated with a given campaign
+      operationId: getCampaign
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  missionsCompleted:
+                    type: array
+                    items:
+                      type: integer
+                  missionsAvailable:
+                    type: array
+                    items:
+                      type: integer
+                  eventsCompleted:
+                    type: array
+                    items:
+                      type: integer
+                  itemsAvailable:
+                    type: array
+                    items:
+                      type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 1,
+                      "name": "Jere's Game",
+                      "missionsCompleted": [
+                        1, 2, 3, 4
+                      ],
+                      "missionsAvailable": [
+                        5
+                      ],
+                      "eventsCompleted": [
+                        8
+                      ],
+                      "itemsAvailable": [
+                        1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8
+                        9, 9, 10, 10, 11, 11, 12, 12
+                      ]
+                    }
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
 
+    put:
+      tags:
+        - Campaigns
+      summary: Updates a specific campaign's name
+      description: >
+        Updates a the name of the specific campaign for the id provided
+      operationId: updateCampaignName
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+            examples:
+              normal:
+                summary: Normal
+                value: >
+                  {
+                    "name": "Kate's Game"
+                  }
+      responses:
+        204:
+          description: Resource updated
+        404:
+          description: An error occurred
+      
+    delete:
+      tags:
+        - Campaigns
+      summary: Deletes a campaign
+      description: >
+        Deletes a campaign for the id given
+      operationId: deleteCampaign
+      parameters:
+        - name: id
+          in: path
+          description: ID of campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        204:
+          description: Resource deleted
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    
 components:
   responses:
     BadRequestError:
