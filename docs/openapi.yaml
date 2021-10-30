@@ -19,7 +19,7 @@ paths:
       summary: Returns a list of players.
       description: >
         Returns a list of basic info for all players.
-      operationId: getUsers
+      operationId: getPlayers
       responses:
         200:
           description: Successful operation
@@ -126,7 +126,7 @@ paths:
       summary: Responds with a specific player's details
       description: >
         Returns all the details associated with a given player
-      operationId: getPlayer
+      operationId: getPlayerDetail
       parameters:
         - name: id
           in: path
@@ -171,7 +171,7 @@ paths:
                       "id": 2,
                       "firstName": "George",
                       "lastName": "Gorgeous",
-                      "email": "gg@ggmail.com"
+                      "email": "gg@ggmail.com",
                       "characters": [
                         {
                           "id": 3,
@@ -385,26 +385,30 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         default:
           $ref: '#/components/responses/UnexpectedError'
-  
-  /characters/{id}:
+
     get:
       tags:
         - Characters
-      summary: Responds with a specific character's details
+      summary: Respond with details for a a single character or group of characters.
       description: >
-        Returns all the details associated with a given character
-      operationId: getCharacter
+        Takes an array of character ids and responds with their details.
+      operationId: getCharacterDetails
       parameters:
-        - name: id
-          in: path
-          description: ID of requested character
-          required: true
+        - in: query
+          name: charIds
           schema:
-            type: integer
+            type: array
+            items:
+              type: integer
+          style: form
+          explode: false
           examples:
-            normal:
-              summary: Normal
-              value: 1
+            singleId:
+              summary: Example of single Character ID
+              value: [1]   # ?charId=1
+            multipleIds:
+              summary: Example of multiple Character IDs
+              value: [1, 2]   # ?charIds=1,2
       responses:
         200:
           description: Successful operation
@@ -443,35 +447,80 @@ paths:
                   goalsCompleted:
                     type: integer
               examples:
-                normal:
-                  summary: Normal
+                singleId:
+                  summary: Single CharacterID
                   value: >
-                    {
-                      "id": 3,
-                      "name": "Turkish",
-                      "playerId": 2,
-                      "class": "Quatryl Demolitionist",
-                      "level": 1,
-                      "xp": 35,
-                      "gold": 16,
-                      "inventory": [
-                        "Heater Shield",
-                        "Healing Potion",
-                        "Winged Shoes"
-                      ],
-                      "perks": [
-                        {
-                          "perkDesc": "Replace one +1 card with one +2 FIRE card",
-                          "perkLevel": 1
-                        }
-                      ],
-                      "goalsCompleted": 1
-                    }
-        404:
-          $ref: '#/components/responses/NotFoundError'
-        default:
-          $ref: '#/components/responses/UnexpectedError'
+                    [
+                      {
+                        "id": 1,
+                        "name": "Turkish",
+                        "playerId": 2,
+                        "class": "Quatryl Demolitionist",
+                        "level": 1,
+                        "xp": 35,
+                        "gold": 16,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion",
+                          "Winged Shoes"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +2 FIRE card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      }
+                    ]
+                multipleIds:
+                  summary: Multiple Character IDs
+                  value: >
+                    [
+                      {
+                        "id": 1,
+                        "name": "Turkish",
+                        "playerId": 2,
+                        "class": "Quatryl Demolitionist",
+                        "level": 1,
+                        "xp": 35,
+                        "gold": 16,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion",
+                          "Winged Shoes"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +2 FIRE card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      },
+                      {
+                        "id": 2,
+                        "name": "John The Gunn",
+                        "playerId": 3,
+                        "class": "Valrath Red Guard",
+                        "level": 1,
+                        "xp": 42,
+                        "gold": 30,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +1 SHIELD card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      }
+                    ]
 
+  /characters/{id}:
     put:
       tags:
         - Characters
@@ -578,7 +627,618 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         default:
           $ref: '#/components/responses/UnexpectedError'
+# ------------------------------------- #
+# Campaigns
+# ------------------------------------- #
+  /campaigns:
+    get:
+      tags:
+        - Campaigns
+      summary: Returns a list of campaigns.
+      description: >
+        Returns a list of basic info for all campaigns.
+      operationId: getCampaigns
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    [
+                      {
+                        "id": 1,
+                        "name": "Jere's Game"
+                      },
+                      {
+                        "id": 2,
+                        "name": "Tom's Game"
+                      }
+                    ]
+                empty:
+                  summary: Empty
+                  value: []
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    
+    post:
+      tags:
+        - Campaigns
+      summary: Creates a campaign
+      description: >
+        Creates a campaign given required information and returns the id
+        of the newly created record.
+      operationId: createCampaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                characters:
+                  type: array
+                  items:
+                    type: integer
+              required:
+                - name
+            examples:
+              normal:
+                summary: Normal
+                value: >
+                  {
+                    "name": "Logan",
+                    "characters": [
+                      1,
+                      2
+                    ]
+                  }
+      responses:
+        201:
+          description: Resource created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 1
+                    }
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  
+  /campaigns/{id}:
+    get:
+      tags:
+        - Campaigns
+      summary: Responds with a specific campaigns's details
+      description: >
+        Returns all the details associated with a given campaign
+      operationId: getCampaignDetail
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  missionsCompleted:
+                    type: array
+                    items:
+                      type: integer
+                  missionsAvailable:
+                    type: array
+                    items:
+                      type: integer
+                  eventsCompleted:
+                    type: array
+                    items:
+                      type: integer
+                  itemsAvailable:
+                    type: array
+                    items:
+                      type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 1,
+                      "name": "Jere's Game",
+                      "missionsCompleted": [
+                        1, 2, 3, 4
+                      ],
+                      "missionsAvailable": [
+                        5
+                      ],
+                      "eventsCompleted": [
+                        8
+                      ],
+                      "itemsAvailable": [
+                        1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8,
+                        9, 9, 10, 10, 11, 11, 12, 12
+                      ]
+                    }
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
 
+    put:
+      tags:
+        - Campaigns
+      summary: Updates a specific campaign's name
+      description: >
+        Updates a the name of the specific campaign for the id provided
+      operationId: updateCampaignName
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+            examples:
+              normal:
+                summary: Normal
+                value: >
+                  {
+                    "name": "Kate's Game"
+                  }
+      responses:
+        204:
+          description: Resource updated
+        404:
+          description: An error occurred
+      
+    delete:
+      tags:
+        - Campaigns
+      summary: Deletes a campaign
+      description: >
+        Deletes a campaign for the id given
+      operationId: deleteCampaign
+      parameters:
+        - name: id
+          in: path
+          description: ID of campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        204:
+          description: Resource deleted
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+# ------------------------------------- #
+# Sessions
+# ------------------------------------- #
+  /sessions:
+    post:
+      tags:
+        - Sessions
+      summary: Create a new session
+      description: >
+        Creates a new session with a given start date, characters, and mission
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                campaign:
+                  type: integer
+                mission:
+                  type: integer
+                characters:
+                  type: array
+                  items:
+                    type: integer
+              required:
+                - date
+                - campaign
+                - mission
+                - characters
+            examples:
+              normal:
+                summary: Normal
+                value: >
+                  {
+                    "date": "2021-09-28",
+                    "campaign": 1,
+                    "mission": 5,
+                    "characters": [
+                      1,
+                      2,
+                      3
+                    ]
+                  }
+      responses:
+        201:
+          description: Resource created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 1
+                    }
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+    get:
+      tags:
+        - Sessions
+      summary: Returns a list of sessions.
+      description: >
+        Returns a list of basic info for all session.
+      operationId: getSessions
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    date:
+                      type: string
+                    campaign:
+                      type: integer
+                    mission:
+                      type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    [
+                      {
+                        "id": 1,
+                        "date": "2021-09-21",
+                        "campaign": 1,
+                        "mission": 1
+                      },
+                      {
+                        "id": 2,
+                        "date": "2021-09-28",
+                        "campaign": 1,
+                        "mission": 2
+                      }
+                    ]
+                empty:
+                  summary: Empty
+                  value: []
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+  /sessions/{id}:
+    get:
+      tags:
+        - Sessions
+      summary: Responds with a specific session's details
+      description: >
+        Returns all the details associated with a given session
+      operationId: getSessionDetail
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  date:
+                    type: string
+                  campaign:
+                    type: integer
+                  mission:
+                    type: integer
+                  characters:
+                    type: array
+                    items:
+                      type: integer
+                  sessionDifficultyLevel:
+                    type: integer
+                  townEventCompleted:
+                    type: boolean
+                  battleGoalsCompleted:
+                    type: array
+                    items:
+                      type: boolean
+                  missionExperienceGained:
+                    type: integer
+              examples:
+                normal:
+                  summary: Normal
+                  value: >
+                    {
+                      "id": 1,
+                      "date": "2021-09-21",
+                      "campaign": 1,
+                      "mission": 1,
+                      "characters": [
+                        1, 2, 3
+                      ],
+                      "sessionDifficultyLevel": 1,
+                      "townEventCompleted": true,
+                      "battleGoalsCompleted": [
+                        true,
+                        true,
+                        false
+                      ],
+                      "missionExperienceGained": 8
+                    }
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+    put: # TODO flush out put endpoint, may need to break out into multple update functions
+      tags:
+        - Sessions
+      summary: Updates a specific campaign's name
+      description: >
+        Updates a the name of the specific campaign for the id provided
+      operationId: updateSession
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+            examples:
+              normal:
+                summary: Normal
+                value: >
+                  {
+                    "name": "Kate's Game"
+                  }
+      responses:
+        204:
+          description: Resource updated
+        404:
+          description: An error occurred
+  
+  /sessions/{id}/characters:
+    get:
+      tags:
+        - Sessions
+        - Characters
+      summary: Responds with a specific session's characters
+      description: >
+        Returns all the characters associated with a given session
+      operationId: getSessionCharacters
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  playerId:
+                    type: integer
+                  class:
+                    type: string
+                  level:
+                    type: integer
+                  xp:
+                    type: integer
+                  gold:
+                    type: integer
+                  inventory:
+                    type: array
+                    items:
+                      type: string
+                  perks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        perkDesc:
+                          type: string
+                        perkLevel:
+                          type: integer
+                  goalsCompleted:
+                    type: integer
+              examples:
+                singleId:
+                  summary: Single CharacterID
+                  value: >
+                    [
+                      {
+                        "id": 1,
+                        "name": "Turkish",
+                        "playerId": 2,
+                        "class": "Quatryl Demolitionist",
+                        "level": 1,
+                        "xp": 35,
+                        "gold": 16,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion",
+                          "Winged Shoes"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +2 FIRE card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      }
+                    ]
+                multipleIds:
+                  summary: Multiple Character IDs
+                  value: >
+                    [
+                      {
+                        "id": 1,
+                        "name": "Turkish",
+                        "playerId": 2,
+                        "class": "Quatryl Demolitionist",
+                        "level": 1,
+                        "xp": 35,
+                        "gold": 16,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion",
+                          "Winged Shoes"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +2 FIRE card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      },
+                      {
+                        "id": 2,
+                        "name": "John The Gunn",
+                        "playerId": 3,
+                        "class": "Valrath Red Guard",
+                        "level": 1,
+                        "xp": 42,
+                        "gold": 30,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +1 SHIELD card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      }
+                    ]
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  
 components:
   responses:
     BadRequestError:
