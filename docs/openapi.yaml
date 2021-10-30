@@ -1103,6 +1103,142 @@ paths:
           description: Resource updated
         404:
           description: An error occurred
+  
+  /sessions/{id}/characters:
+    get:
+      tags:
+        - Sessions
+        - Characters
+      summary: Responds with a specific session's characters
+      description: >
+        Returns all the characters associated with a given session
+      operationId: getSessionCharacters
+      parameters:
+        - name: id
+          in: path
+          description: ID of requested campaign
+          required: true
+          schema:
+            type: integer
+          examples:
+            normal:
+              summary: Normal
+              value: 1
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  playerId:
+                    type: integer
+                  class:
+                    type: string
+                  level:
+                    type: integer
+                  xp:
+                    type: integer
+                  gold:
+                    type: integer
+                  inventory:
+                    type: array
+                    items:
+                      type: string
+                  perks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        perkDesc:
+                          type: string
+                        perkLevel:
+                          type: integer
+                  goalsCompleted:
+                    type: integer
+              examples:
+                singleId:
+                  summary: Single CharacterID
+                  value: >
+                    [
+                      {
+                        "id": 1,
+                        "name": "Turkish",
+                        "playerId": 2,
+                        "class": "Quatryl Demolitionist",
+                        "level": 1,
+                        "xp": 35,
+                        "gold": 16,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion",
+                          "Winged Shoes"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +2 FIRE card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      }
+                    ]
+                multipleIds:
+                  summary: Multiple Character IDs
+                  value: >
+                    [
+                      {
+                        "id": 1,
+                        "name": "Turkish",
+                        "playerId": 2,
+                        "class": "Quatryl Demolitionist",
+                        "level": 1,
+                        "xp": 35,
+                        "gold": 16,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion",
+                          "Winged Shoes"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +2 FIRE card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      },
+                      {
+                        "id": 2,
+                        "name": "John The Gunn",
+                        "playerId": 3,
+                        "class": "Valrath Red Guard",
+                        "level": 1,
+                        "xp": 42,
+                        "gold": 30,
+                        "inventory": [
+                          "Heater Shield",
+                          "Healing Potion"
+                        ],
+                        "perks": [
+                          {
+                            "perkDesc": "Replace one +1 card with one +1 SHIELD card",
+                            "perkLevel": 1
+                          }
+                        ],
+                        "goalsCompleted": 1
+                      }
+                    ]
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  
 components:
   responses:
     BadRequestError:
