@@ -171,7 +171,7 @@ paths:
                       "id": 2,
                       "firstName": "George",
                       "lastName": "Gorgeous",
-                      "email": "gg@ggmail.com"
+                      "email": "gg@ggmail.com",
                       "characters": [
                         {
                           "id": 3,
@@ -794,7 +794,7 @@ paths:
                         8
                       ],
                       "itemsAvailable": [
-                        1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8
+                        1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8,
                         9, 9, 10, 10, 11, 11, 12, 12
                       ]
                     }
@@ -1014,35 +1014,30 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  date:
+                    type: string
+                  campaign:
+                    type: integer
+                  mission:
+                    type: integer
+                  characters:
+                    type: array
+                    items:
                       type: integer
-                    date:
-                      type: string
-                    campaign:
-                      type: integer
-                    mission:
-                      type: integer
-                    characters:
-                      type: array
-                      items:
-                        type: integer
-                    sessionDifficultyLevel:
-                      type: integer
-                    townEventCompleted:
+                  sessionDifficultyLevel:
+                    type: integer
+                  townEventCompleted:
+                    type: boolean
+                  battleGoalsCompleted:
+                    type: array
+                    items:
                       type: boolean
-                    battleGoalsCompleted:
-                      type: object
-                      properties:
-                        character:
-                          type: integer
-                        goalCompleted:
-                          type: boolean
-                    missionExperienceGained:
-                      type: integer
+                  missionExperienceGained:
+                    type: integer
               examples:
                 normal:
                   summary: Normal
@@ -1057,11 +1052,11 @@ paths:
                       ],
                       "sessionDifficultyLevel": 1,
                       "townEventCompleted": true,
-                      "battleGoalsCompleted": {
-                        1: true,
-                        2: true,
-                        3: false
-                      },
+                      "battleGoalsCompleted": [
+                        true,
+                        true,
+                        false
+                      ],
                       "missionExperienceGained": 8
                     }
         404:
