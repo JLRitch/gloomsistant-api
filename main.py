@@ -6,26 +6,11 @@ import sqlite3
 from fastapi import FastAPI
 
 # project modules
-from db.connection import db_conn
-from db import queryconverter
+from routes.api import router as api_router
 
+def get_application() -> FastAPI:
+    application = FastAPI(title="Gloomsistant_API", debug=True, version="0.1.0")
+    application.include_router(api_router)
+    return application
 
-app = FastAPI()
-cur = db_conn.cursor()
-
-# TODO refactor routes to their own modules
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@app.get("/players")
-async def players():
-    cur.execute(
-        "SELECT * FROM player"
-    )
-    query = cur.fetchall()
-    resp_data = queryconverter.to_obj_array(
-        query_resp = query,
-        obj_keys=["id", "firstName", "lastName", "email"]
-    )
-    return resp_data
+app = get_application()

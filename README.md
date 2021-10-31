@@ -16,7 +16,7 @@ python -m db.initialize
 uvicorn main:app --reload
 ```
 
-You can make requests to the api endpoints such as: http://127.0.0.1:8000/ or http://127.0.0.1:8000/players
+You can make requests to the api endpoints such as: http://127.0.0.1:8000/players
 You can see the interactive documentation at: http://127.0.0.1:8000/docs
 
 **Test:**
