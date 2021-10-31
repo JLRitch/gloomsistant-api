@@ -1,0 +1,1 @@
+CREATE TABLE `player` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, `firstName` TEXT, `lastName` TEXT, `email` TEXT UNIQUE );
