@@ -36,6 +36,7 @@ pip-delete-this-directory.txt
 
 # sqlite
 db/*.sqlite
+db/*.sqlite-journal
 
 # Unit test / coverage reports
 htmlcov/
