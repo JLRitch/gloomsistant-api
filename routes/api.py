@@ -10,4 +10,4 @@ from routes import players
 
 
 router = APIRouter()
-router.include_router(players.router, tags=["players"], prefix="/players")
+router.include_router(players.router, tags=["players"])
