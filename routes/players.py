@@ -14,6 +14,18 @@ from models.schemas.players import Player
 cur = db_conn.cursor()
 router = APIRouter()
 
+def fetch_player_id(id: int) -> list:
+    """
+    Checks the database for a given player id and raises and HTTPException 404 if not present.
+    """
+    cur.execute(
+        "SELECT * FROM player WHERE player.id = ?",
+        (id,)
+    )
+    query = cur.fetchall()
+    if query == []:
+        raise HTTPException(status_code=404, detail=f"Player with id {id} not found.")
+    return query
 
 @router.get("/players")
 async def get_players():
@@ -50,16 +62,51 @@ async def create_player(player: Player):
     summary="Responds with a specific player's details",
     description="Returns all the details associated with a given player"
 )
-async def get_players(id: int):
-    cur.execute(
-        "SELECT * FROM player WHERE player.id = ?",
-        (id,)
-    )
-    query = cur.fetchall()
+async def get_player_id(id: int):
+    query = fetch_player_id(id)
     resp_data = queryconverter.to_obj_array(
         query_resp = query,
         obj_keys=["id", "firstName", "lastName", "email"]
     )
-    if resp_data == []:
-        raise HTTPException(status_code=404, detail=f"Player with id {id} not found.")
     return resp_data
+
+@router.put(
+    "/players/{id}",
+    summary="Updates a specific player's details",
+    description="Updates the details associated with a given player"
+)
+async def update_player(id: int, player: Player):
+    # check if player exists, raise error if not
+    fetch_player_id(id)
+    # update player if it exists
+    cur.execute(
+        """
+            UPDATE player 
+            SET firstName = ?,
+                lastName = ?,
+                email = ?
+            WHERE
+                player.id = ?;
+        """,
+        (
+            player.firstName,
+            player.lastName,
+            player.email,
+            id
+        )
+    )
+    db_conn.commit()
+    return {f"player {id} successfully updated!"}
+
+@router.delete(
+    "/players/{id}",
+    summary="Deletes a specific player",
+    description="Delete a player given a specific id"
+)
+async def delete_player(id: int):
+    fetch_player_id(id)
+    cur.execute(
+        "DELETE FROM player WHERE player.id = ?",
+        (id, )
+    )
+    return {f"player {id} successfully deleted, hope you meant to do that!"}
