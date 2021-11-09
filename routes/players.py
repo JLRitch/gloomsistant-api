@@ -109,4 +109,5 @@ async def delete_player(id: int):
         "DELETE FROM player WHERE player.id = ?",
         (id, )
     )
+    db_conn.commit()
     return {f"player {id} successfully deleted, hope you meant to do that!"}
