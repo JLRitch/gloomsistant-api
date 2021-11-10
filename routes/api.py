@@ -6,8 +6,9 @@ import sqlite3
 from fastapi import APIRouter
 
 # project modules
-from routes import players
+from routes import players, characters
 
 
 router = APIRouter()
 router.include_router(players.router, tags=["players"])
+router.include_router(characters.router, tags=["characters"])

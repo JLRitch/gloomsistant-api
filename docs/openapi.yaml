@@ -345,9 +345,10 @@ paths:
                 summary: Normal
                 value: >
                   {
+                    "id": 1,
                     "name": "Turkish",
                     "playerId": 2,
-                    "class": "Quatryl Demolitionist",
+                    "characterClass": "Quatryl Demolitionist",
                     "level": 1,
                     "xp": 35,
                     "gold": 16,

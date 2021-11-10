@@ -1,4 +1,4 @@
-"""queryconverter.py is a utility to convert queries from a sqlite database into a """
+"""queryconverter.py is a set of utilities to convert queries from a sqlite database into a target object"""
 
 def to_obj_array(query_resp: list, obj_keys: list) -> list:
     """
@@ -11,3 +11,9 @@ def to_obj_array(query_resp: list, obj_keys: list) -> list:
             out_record[k] = in_record[i]
         out_list.append(out_record)
     return out_list
+
+def delimited_str_to_list(delimited_value: str, delimiter: str="|"):
+    """
+    Converts a string value to a delimited list. Default delimiter is "|"
+    """
+    return delimited_value.split(delimiter)

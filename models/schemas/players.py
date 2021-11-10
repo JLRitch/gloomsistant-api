@@ -9,14 +9,7 @@ from pydantic import BaseModel
 
 
 class Player(BaseModel):
+    id: int=None
     firstName: str
     lastName: str
     email: str
-
-
-# class CommentInResponse(RWSchema):
-#     comment: Comment
-
-
-# class CommentInCreate(RWSchema):
-#     body: str
