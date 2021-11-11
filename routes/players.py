@@ -14,17 +14,17 @@ from models.schemas.players import Player
 cur = db_conn.cursor()
 router = APIRouter()
 
-def fetch_player_id(id: int) -> list:
+def fetch_player_id(player_id: int) -> list:
     """
     Checks the database for a given player id and raises and HTTPException 404 if not present.
     """
     cur.execute(
         "SELECT * FROM player WHERE player.id = ?",
-        (id,)
+        (player_id,)
     )
     query = cur.fetchall()
     if query == []:
-        raise HTTPException(status_code=404, detail=f"Player with id {id} not found.")
+        raise HTTPException(status_code=404, detail=f"Player with id {player_id} not found.")
     return query
 
 @router.get("/players")
@@ -62,8 +62,8 @@ async def create_player(player: Player):
     summary="Responds with a specific player's details",
     description="Returns all the details associated with a given player"
 )
-async def get_player_id(id: int):
-    query = fetch_player_id(id)
+async def get_player_id(player_id: int):
+    query = fetch_player_id(player_id)
     resp_data = queryconverter.to_obj_array(
         query_resp = query,
         obj_keys=["id", "firstName", "lastName", "email"]
@@ -71,13 +71,13 @@ async def get_player_id(id: int):
     return resp_data
 
 @router.put(
-    "/players/{id}",
+    "/players/{player_id}",
     summary="Updates a specific player's details",
     description="Updates the details associated with a given player"
 )
-async def update_player(id: int, player: Player):
+async def update_player(player_id: int, player: Player):
     # check if player exists, raise error if not
-    fetch_player_id(id)
+    fetch_player_id(player_id)
     # update player if it exists
     cur.execute(
         """
@@ -92,22 +92,22 @@ async def update_player(id: int, player: Player):
             player.firstName,
             player.lastName,
             player.email,
-            id
+            player_id
         )
     )
     db_conn.commit()
-    return {f"player {id} successfully updated!"}
+    return {f"player {player_id} successfully updated!"}
 
 @router.delete(
-    "/players/{id}",
+    "/players/{player_id}",
     summary="Deletes a specific player",
     description="Delete a player given a specific id"
 )
-async def delete_player(id: int):
-    fetch_player_id(id)
+async def delete_player(player_id: int):
+    fetch_player_id(player_id)
     cur.execute(
         "DELETE FROM player WHERE player.id = ?",
-        (id, )
+        (player_id, )
     )
     db_conn.commit()
-    return {f"player {id} successfully deleted, hope you meant to do that!"}
+    return {f"player {player_id} successfully deleted, hope you meant to do that!"}

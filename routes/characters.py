@@ -1,5 +1,5 @@
 # standard modules
-from typing import Optional
+from typing import List, Optional
 
 # external modules
 from fastapi import APIRouter, Body, Depends, HTTPException
@@ -14,29 +14,37 @@ from models.schemas.characters import Character
 cur = db_conn.cursor()
 router = APIRouter()
 
-def fetch_character_id(id: int) -> list:
+def fetch_character_id(char_id: int) -> list:
     """
-    Checks the database for a given character id and raises and HTTPException 404 if not present.
+    Checks the database for a given character char_id and raises and HTTPException 404 if not present.
     """
     cur.execute(
         "SELECT * FROM character WHERE character.id = ?",
-        (id,)
+        (char_is,)
     )
     query = cur.fetchall()
     if query == []:
-        raise HTTPException(status_code=404, detail=f"character with id {id} not found.")
+        raise HTTPException(status_code=404, detail=f"character with id {char_id} not found.")
     return query
 
 @router.get("/characters")
-async def get_characters():
+async def get_characters(char_ids):
+    try:
+        q_list = ("?,"*len(char_ids))[:-1]
+    except IndexError: # assumed char_ids is empty
+        q_list = None
+    query = f"SELECT * FROM character WHERE character.id IN ({q_list})"
     cur.execute(
-        "SELECT * FROM character"
+        query,
+        char_ids
     )
     query = cur.fetchall()
     query_array = queryconverter.to_obj_array(
         query_resp = query,
         obj_keys=["id", "name", "playerId", "characterClass", "level", "xp", "gold", "inventory", "goalsCompleted"]
     )
+    if query == []:
+        raise HTTPException(status_code=404, detail=f"character with id {char_ids} not found.")
     resp_data = []
     for char in query_array:
         char["inventory"] = queryconverter.delimited_str_to_list(char["inventory"])
