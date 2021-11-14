@@ -6,6 +6,9 @@ git_push.sh
 test-requirements.txt
 setup.py
 
+# databases
+db/*.sqlite
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
