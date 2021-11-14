@@ -1,4 +1,4 @@
-CREATE TABLE `character` (
+CREATE TABLE IF NOT EXISTS `character` (
     `id` INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
     `name` TEXT,
     `playerId` TEXT,
