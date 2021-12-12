@@ -108,3 +108,39 @@ async def delete_character(char_id: int):
     )
     db_conn.commit()
     return {f"character {char_id} successfully deleted, hope you meant to do that!"}
+
+@router.put(
+    "/characters/{char_id}",
+    summary="Updates a specific character",
+    description="Update a character given a specific id" 
+)
+async def update_character(char_id: int, character: Character):
+    # check for an existing character with this char_id
+    fetch_character_id(char_id=char_id)
+    # insert into db if it appears to be a new character
+    cur.execute(
+        """
+            UPDATE character
+            SET name = ?,
+                characterClass = ?,
+                playerId = ?,
+                level = ?,
+                xp = ?,
+                gold = ?,
+                goalsCompleted = ?
+            WHERE
+                character.id = ?;
+        """,
+        (
+            character.name,
+            character.characterClass,
+            character.playerId,
+            character.level,
+            character.xp,
+            character.gold,
+            character.goalsCompleted,
+            char_id,
+        )
+    )
+    db_conn.commit()
+    return {"character successfully updated!"}

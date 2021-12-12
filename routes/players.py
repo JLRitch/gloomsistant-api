@@ -58,7 +58,7 @@ async def create_player(player: Player):
     return {"player successfully created!"}
 
 @router.get(
-    "/players/{id}",
+    "/players/{player_id}",
     summary="Responds with a specific player's details",
     description="Returns all the details associated with a given player"
 )
