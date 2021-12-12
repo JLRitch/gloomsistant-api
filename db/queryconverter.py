@@ -12,8 +12,12 @@ def to_obj_array(query_resp: list, obj_keys: list) -> list:
         out_list.append(out_record)
     return out_list
 
-def delimited_str_to_list(delimited_value: str, delimiter: str="|"):
+def delimited_str_to_list(delimited_value: str, delimiter: str="|") -> list:
     """
     Converts a string value to a delimited list. Default delimiter is "|"
     """
-    return delimited_value.split(delimiter)
+    if delimited_value is not None:
+        out_list = delimited_value.split(delimiter)
+    else:
+        out_list = []
+    return out_list
