@@ -20,7 +20,7 @@ def fetch_character_id(char_id: int) -> list:
     """
     cur.execute(
         "SELECT * FROM character WHERE character.id = ?",
-        (char_is,)
+        (char_id,)
     )
     query = cur.fetchall()
     if query == []:
@@ -51,20 +51,28 @@ async def get_characters(char_ids):
         resp_data.append(char)
     return resp_data
 
-# @router.post("/characters")
-# async def create_character(character: Character):
-#     # check for duplicate email
-#     cur.execute(
-#         "SELECT * FROM character WHERE character.email = ?",
-#         (character.email,)
-#     )
-#     query = cur.fetchall()
-#     if len(query) > 0:
-#         raise HTTPException(status_code=409, detail=f"character with email {character.email} already exists.")
-#     # insert into db if new email address supplied
-#     cur.execute(
-#         "INSERT INTO character (firstName, lastName, email) VALUES (?, ?, ?)",
-#         (character.firstName, character.lastName, character.email)
-#     )
-#     db_conn.commit()
-#     return {"character successfully created!"}
+@router.post("/characters")
+async def create_character(
+    characterName: str,
+    characterClass: str,
+    playerId: int
+):
+    # check for an existing character of this class for the given name & playerid
+    query = "SELECT * FROM character WHERE character.name = ? AND character.playerid = ? AND character.characterClass = ?"
+    cur.execute(
+        query,
+        (characterName, playerId, characterClass)
+    )
+    query = cur.fetchall()
+    if len(query) > 0:
+        raise HTTPException(
+            status_code=409,
+            detail=f"The playerid {playerId} already has a {characterClass} named {characterName}."
+        )
+    # insert into db if it appears to be a new character
+    cur.execute(
+        "INSERT INTO character (name, characterClass, playerId, level, xp, gold, goalsCompleted) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (characterName, characterClass, playerId, 1, 0, 0, 0),
+    )
+    db_conn.commit()
+    return {"character successfully created!"}
