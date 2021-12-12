@@ -107,4 +107,4 @@ async def delete_character(char_id: int):
         (char_id, )
     )
     db_conn.commit()
-    return {f"player {char_id} successfully deleted, hope you meant to do that!"}
+    return {f"character {char_id} successfully deleted, hope you meant to do that!"}
