@@ -8,7 +8,7 @@ from starlette import status
 # project modules
 from db.connection import db_conn
 from db import queryconverter
-from models.schemas.characters import Character
+from models.schemas.characters import Character, Perk
 
 
 cur = db_conn.cursor()
@@ -26,6 +26,22 @@ def fetch_character_id(char_id: int) -> list:
     if query == []:
         raise HTTPException(status_code=404, detail=f"character with id {char_id} not found.")
     return query
+
+def fetch_perks(char_id: int) -> list:
+    """
+    Finds perks for a given char_id
+    """
+    cur.execute(
+        "SELECT * FROM perks WHERE perks.characterId = ?",
+        (char_id,)
+    )
+    query = cur.fetchall()
+    query_array = queryconverter.to_obj_array(
+        query_resp = query,
+        obj_keys=["id", "characterId", "perkDesc", "perkLevel"],
+        key_filter=["perkDesc", "perkLevel"]
+    )
+    return query_array
 
 @router.get("/characters")
 async def get_characters(char_ids):
@@ -46,8 +62,10 @@ async def get_characters(char_ids):
     if query == []:
         raise HTTPException(status_code=404, detail=f"character with id {char_ids} not found.")
     resp_data = []
+    # reformat inventory query and fetchperks
     for char in query_array:
         char["inventory"] = queryconverter.delimited_str_to_list(char["inventory"])
+        char["perks"] = fetch_perks(char_id=char["id"])
         resp_data.append(char)
     return resp_data
 
@@ -76,3 +94,17 @@ async def create_character(
     )
     db_conn.commit()
     return {"character successfully created!"}
+
+@router.delete(
+    "/characters/{char_id}",
+    summary="Deletes a specific character",
+    description="Delete a character given a specific id"
+)
+async def delete_character(char_id: int):
+    fetch_character_id(char_id=char_id)
+    cur.execute(
+        "DELETE FROM character WHERE character.id = ?",
+        (char_id, )
+    )
+    db_conn.commit()
+    return {f"player {char_id} successfully deleted, hope you meant to do that!"}
