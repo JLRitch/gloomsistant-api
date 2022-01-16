@@ -55,18 +55,16 @@ async def get_characters(char_ids):
         char_ids
     )
     query = cur.fetchall()
-    query_array = queryconverter.to_obj_array(
+    resp_data = queryconverter.to_obj_array(
         query_resp = query,
         obj_keys=["id", "name", "playerId", "characterClass", "level", "xp", "gold", "inventory", "goalsCompleted"]
     )
     if query == []:
         raise HTTPException(status_code=404, detail=f"character with id {char_ids} not found.")
-    resp_data = []
     # reformat inventory query and fetchperks
-    for char in query_array:
+    for char in resp_data:
         char["inventory"] = queryconverter.delimited_str_to_list(char["inventory"])
         char["perks"] = fetch_perks(char_id=char["id"])
-        resp_data.append(char)
     return resp_data
 
 @router.post("/characters")
