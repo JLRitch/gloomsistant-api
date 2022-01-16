@@ -14,6 +14,9 @@ from models.schemas.players import Player
 cur = db_conn.cursor()
 router = APIRouter()
 
+###########
+# helper functions
+###########
 def fetch_player_id(player_id: int) -> list:
     """
     Checks the database for a given player id and raises and HTTPException 404 if not present.
@@ -27,6 +30,9 @@ def fetch_player_id(player_id: int) -> list:
         raise HTTPException(status_code=404, detail=f"Player with id {player_id} not found.")
     return query
 
+###########
+# endpoints
+###########
 @router.get("/players")
 async def get_players():
     cur.execute(

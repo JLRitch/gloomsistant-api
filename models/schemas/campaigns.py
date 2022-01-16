@@ -8,7 +8,12 @@ from pydantic import BaseModel
 
 class Campaign(BaseModel):
     name: str
-    missionsCompleted: List[str]
-    missionsAvailable: List[str]
-    eventsCompleted: List[str]
-    itemsAvailable: List[str]
+    gameMasterId: int
+    missionsCompleted: List[int]
+    missionsAvailable: List[int]
+    eventsCompleted: List[int]
+    itemsAvailable: List[int]
+    characters: List[int]
+    gameMasterFirstName: str
+    gameMasterLastName: str
+    gameMasterEmail: str
