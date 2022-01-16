@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS `campaign` (
     `missionsCompleted` TEXT,
     `missionsAvailable` TEXT,
     'eventsCompleted' TEXT,
-    'itemsAvailable' TEXT
+    'itemsAvailable' TEXT,
+    'characters' TEXT
 );
