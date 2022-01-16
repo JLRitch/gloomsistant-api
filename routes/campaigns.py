@@ -39,14 +39,15 @@ def fetch_campaign_id(camp_id: int) -> list:
 )
 async def get_campaigns():
     cur.execute(
-        "SELECT id, name, characters FROM campaign"
+        "SELECT id, name, gameMasterId, characters FROM campaign"
     )
     query = cur.fetchall()
     resp_data = queryconverter.to_obj_array(
         query_resp=query,
         obj_keys=[
             "id", 
-            "name", 
+            "name",
+            "gameMasterId",
             "characters"
         ]
     )
@@ -61,18 +62,35 @@ async def get_campaigns():
     summary="Responds with a specific campaign's details",
     description="Returns all details associated with a given campaign"
 )
-async def get_campaigns(camp_id: int):
-    query = fetch_campaign_id(camp_id=camp_id)
+async def get_campaign(camp_id: int):
+    fetch_campaign_id(camp_id=camp_id)
+    cur.execute(
+        '''
+            SELECT 
+                campaign.*,
+                player.firstName as gameMasterFirstName,
+                player.lastName as gameMasterLastName,
+                player.email as gameMasterEmail
+            FROM campaign LEFT JOIN player on campaign.gameMasterId = player.id
+            WHERE campaign.id = ?
+        ''',
+        (camp_id,)
+    )
+    query = cur.fetchall()
     resp_data = queryconverter.to_obj_array(
         query_resp=query,
         obj_keys=[
             "id", 
-            "name", 
+            "name",
+            "gameMasterId",
             "missionsCompleted", 
             "missionsAvailable", 
             "eventsCompleted", 
             "itemsAvailable",
-            "characters"
+            "characters",
+            "gameMasterFirstName",
+            "gameMasterLastName",
+            "gameMasterEmail"
         ]
     )
     # reformat delimited lists into python lists (consider refactor to nosql db and bypass this need)
