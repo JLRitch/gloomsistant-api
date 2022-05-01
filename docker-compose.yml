@@ -1,6 +1,32 @@
-version: "3.3"
+version: "3.8"
 services:
+  
+  db-pg:
+    image: postgres:14.2-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+
+  pg-admin:
+    image: dpage/pgadmin4:latest
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=dood@doodmail.com
+      - PGADMIN_DEFAULT_PASSWORD=Dood123!
+    ports:
+      - '80:80'
+
   api:
     build: .
     ports:
       - "8000:8000"
+    depends_on:
+      - db-pg
+  
+volumes:
+  db:
+    driver: local
