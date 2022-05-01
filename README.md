@@ -28,9 +28,11 @@ uvicorn main:app
 ## Run the API (docker)
 **Build and run the api with docker-compose up:**
 ```bash
-docker-compose up
+docker-compose --env-file ./config/.env.dev up
 ```
 
-You can make requests to the api endpoints such as: http://0.0.0.0:8000/players
+You can make requests to the api endpoints such as: http://localhost:8000/players
 
-You can see the interactive documentation at: http://0.0.0.0:8000/docs
+You can see the interactive documentation at: http://localhost:8000/docs
+
+You can access the PGAdmin Interface at: http://localhost:80
