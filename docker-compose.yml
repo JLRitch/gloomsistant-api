@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  
+  db-pg:
+    image: postgres:14.2-alpine
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes: 
+      - db:/var/lib/postgresql/data
+
+  pg-admin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - '80:80'
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+
+  api:
+    build: 
+      context: .
+      args:
+        - PY_ENV=${PY_ENV}
+    environment:
+      - PY_ENV=${PY_ENV}
+    ports:
+      - "8000:8000"
+    volumes:
+     - ./test:/usr/test
+    depends_on:
+      - db-pg
+  
+volumes:
+  db:
+    driver: local
