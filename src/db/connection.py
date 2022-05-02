@@ -2,6 +2,9 @@
 import pathlib as pl
 import sqlite3
 
+# external modules
+# import psycopg2
+
 db_folder = pl.Path().cwd().joinpath("db")
 db_path = db_folder.joinpath("db-dev.sqlite")
 

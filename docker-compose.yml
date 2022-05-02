@@ -21,9 +21,16 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
 
   api:
-    build: .
+    build: 
+      context: .
+      args:
+        - PY_ENV=${PY_ENV}
+    environment:
+      - PY_ENV=${PY_ENV}
     ports:
       - "8000:8000"
+    volumes:
+     - ./test:/usr/test
     depends_on:
       - db-pg
   

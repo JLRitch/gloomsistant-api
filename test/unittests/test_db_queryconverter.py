@@ -4,7 +4,7 @@ import unittest
 # external modules
 
 # project modules
-from db import queryconverter
+from src.db import queryconverter
 
 class TestToObjArray(unittest.TestCase):
 

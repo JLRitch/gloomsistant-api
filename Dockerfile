@@ -1,15 +1,19 @@
 FROM python:3.9-slim
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+WORKDIR /usr
 
 COPY requirements.txt ./
+COPY requirements-dev.txt ./
+COPY requirements.sh ./
 
-RUN ls
+ARG PY_ENV=prod
+ENV PY_ENV=$PY_ENV
 
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN bash requirements.sh
 
-COPY . /usr/src/app
+RUN mkdir -p /src
+COPY ./src /usr/src
+WORKDIR /usr/src
 
 EXPOSE 8000
 
@@ -17,3 +21,6 @@ EXPOSE 8000
 RUN python3 -m db.initialize
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# GROWTH, enable live reload
+# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload-dir", "./models", "--reload-dir", "./routes", "--reload-dir", "./test"]
